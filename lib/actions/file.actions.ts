@@ -1,5 +1,9 @@
 "use server";
 
+// https://api.telegram.org/bot7993411433:AAH28tznkIcStXuyLR3bX738H4Px9pig3e0/getUpdates
+// https://api.telegram.org/bot7993411433:AAH28tznkIcStXuyLR3bX738H4Px9pig3e0/getFile?file_id=BQACAgUAAyEGAASLei-nAAMGZ6J-VuBYVBz2ayzUd0PVwAycY9oAAkkTAAL94BlVPK08cvT5kv02BA
+// https://api.telegram.org/file/bot7993411433:AAH28tznkIcStXuyLR3bX738H4Px9pig3e0/documents/file_9.png
+
 import { createAdminClient, createSessionClient } from "@/lib/appwrite";
 import { InputFile } from "node-appwrite/file";
 import { appwriteConfig } from "@/lib/appwrite/config";
@@ -8,9 +12,9 @@ import { constructFileUrl, getFileType, parseStringify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 
-import fs from 'fs';
 import axios from 'axios';
 import FormData from 'form-data';
+import { generateThumbnail } from "./cloudinary.actions";
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID!;
 
@@ -19,33 +23,37 @@ const handleError = (error: unknown, message: string) => {
   throw error;
 };
 
-const uploadToTelegram = async (file: Buffer, fileName: string) => {
+const uploadToTelegram = async (fileBuffer: Buffer, fileName: string, mimeType: string) => {
   try {
-    const tempFilePath = `/tmp/${fileName}`;
-    fs.writeFileSync(tempFilePath, file);
-
-    // Create FormData for Telegram upload
     const formData = new FormData();
     formData.append("chat_id", TELEGRAM_CHAT_ID);
-    formData.append("document", file, { filename: fileName });
+
+    // Choose the correct Telegram API field based on file type
+    let telegramField: string;
+    if (mimeType.startsWith("image/")) {
+      telegramField = "photo"; // Image upload
+    } else if (mimeType.startsWith("video/")) {
+      telegramField = "video"; // Video upload
+    } else {
+      telegramField = "document"; // PDFs & other files
+    }
+
+    // Append the file
+    formData.append(telegramField, fileBuffer, { filename: fileName });
 
     // Upload to Telegram
     const response = await axios.post(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`,
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/send${telegramField.charAt(0).toUpperCase() + telegramField.slice(1)}`,
       formData,
-      { headers: {
-          ...formData.getHeaders()
-        }
-      }
+      { headers: formData.getHeaders() }
     );
 
-    // Cleanup temp file
-    fs.unlinkSync(tempFilePath);
+    console.log("Telegram Upload Success:", JSON.stringify(response.data));
+    console.log("telegramField", telegramField);
 
     // Extract Telegram file ID
-    console.log("Telegram Upload Success:", response.data);
-
-    const telegramFileId = response.data.result.document.file_id;
+    const fieldData = response.data.result[telegramField];
+    const telegramFileId = Array.isArray(fieldData) ? fieldData[0].file_id : fieldData.file_id;
     return telegramFileId;
   } catch (error) {
     console.error("Telegram Upload Failed:", error);
@@ -57,6 +65,8 @@ const getTelegramFileURL = async (telegramFileId: string) => {
   const response = await axios.get(
     `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getFile?file_id=${telegramFileId}`
   );
+  // console.log("URL Response -> ",response.data);
+  // console.log("-------------");
 
   const filePath = response.data.result.file_path;
   return `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`;
@@ -74,7 +84,7 @@ export const uploadFile = async ({
     // Convert File to Buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    
+
     const inputFile = InputFile.fromBuffer(file, file.name);
 
     // const bucketFile = await storage.createFile(
@@ -84,13 +94,15 @@ export const uploadFile = async ({
     // );
 
     // Start both uploads in parallel
-    const [bucketFile, telegramFileId] = await Promise.all([
+    const [bucketFile, telegramFileId, thumbnailUrl] = await Promise.all([
       storage.createFile(appwriteConfig.bucketId, ID.unique(), inputFile),
-      uploadToTelegram(buffer, file.name), // Pass Buffer instead of File
+      uploadToTelegram(buffer, file.name, file.type), // Pass Buffer instead of File
+      generateThumbnail(buffer, file.type, file.name)
     ]);
 
-    console.log("telegramFileId -> ",telegramFileId);
-    console.log("telegramFileURL -> ", getTelegramFileURL(telegramFileId));
+    console.log("telegramFileId -> ", telegramFileId);
+    console.log("thumbnailUrl -> ", thumbnailUrl)
+    // console.log("telegramFileURL -> ", getTelegramFileURL(telegramFileId));
 
     const fileDocument = {
       type: getFileType(bucketFile.name).type,
@@ -103,8 +115,10 @@ export const uploadFile = async ({
       users: [],
       bucketFileId: bucketFile.$id,
       telegramFileId,
-      telegramFileURL : await getTelegramFileURL(telegramFileId)
+      telegramFileURL: await getTelegramFileURL(telegramFileId),
+      // thumbnail: thumbnailUrl, // Store the thumbnail URL
     };
+
 
     const newFile = await databases
       .createDocument(
@@ -115,12 +129,12 @@ export const uploadFile = async ({
       )
       .catch(async (error: unknown) => {
         console.log(error, "------");
-        
+
         await storage.deleteFile(appwriteConfig.bucketId, bucketFile.$id);
         handleError(error, "Failed to create file document");
       });
 
-    console.log(newFile);      
+    console.log("newFile -> ",newFile);
 
     revalidatePath(path);
     return parseStringify(newFile);
@@ -180,6 +194,14 @@ export const getFiles = async ({
     );
 
     console.log({ files });
+
+    // files.documents.map( async (file) => {
+    //   const telegramFileId = file.telegramFileId;
+    //   const url = await getTelegramFileURL(telegramFileId);
+    //   console.log(file.name,"-->",url);
+    //   return url;
+    // })
+
     return parseStringify(files);
   } catch (error) {
     handleError(error, "Failed to get files");

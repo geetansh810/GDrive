@@ -7,7 +7,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <section className="hidden w-1/2 items-center justify-center bg-brand p-10 lg:flex xl:w-2/5">
         <div className="flex max-h-[800px] max-w-[430px] flex-col justify-center space-y-12">
           <Image
-            src="/assets/icons/logo-full.svg"
+            src="/assets/brand-logos/vector/default-monochrome.svg"
             alt="logo"
             width={224}
             height={82}
@@ -17,14 +17,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="space-y-5 text-white">
             <h1 className="h1">Manage your files the best way</h1>
             <p className="body-1">
-              This is a place where you can store all your documents.
+              Something like G-Drive but with unlimited storage
             </p>
           </div>
           <Image
-            src="/assets/images/files.png"
+            src="/assets/images/uploadImage.svg"
             alt="Files"
-            width={342}
-            height={342}
+            width={280}
+            height={280}
             className="transition-all hover:rotate-2 hover:scale-105"
           />
         </div>
@@ -33,14 +33,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <section className="flex flex-1 flex-col items-center bg-white p-4 py-10 lg:justify-center lg:p-10 lg:py-0">
         <div className="mb-16 lg:hidden">
           <Image
-            src="/assets/icons/logo-full-brand.svg"
+            src="/assets/brand-logos/vector/default-monochrome.svg"
             alt="logo"
             width={224}
             height={82}
             className="h-auto w-[200px] lg:w-[250px]"
           />
         </div>
-
         {children}
       </section>
     </div>

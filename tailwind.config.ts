@@ -7,12 +7,13 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+	// "bg": "#28003A", "icon": "#E46948"
   theme: {
   	extend: {
   		colors: {
   			brand: {
-  				'100': '#1FA5FF',
-  				DEFAULT: '#47B6FF'
+				'100': '#E46948',
+				DEFAULT: '#28003A'
   			},
   			red: '#FF7474',
   			error: '#b80000',

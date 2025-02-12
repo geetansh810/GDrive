@@ -7,7 +7,35 @@ import { parseStringify } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { avatarPlaceholderUrl } from "@/constants";
 import { redirect } from "next/navigation";
+import axios from "axios";
 
+export const fetchTelegramUpdates = async () => {
+  try {
+    const response = await axios.get(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/getUpdates`
+    );
+    return response.data.result || [];
+  } catch (error) {
+    console.error("Error fetching Telegram updates:", error);
+    throw new Error("Failed to fetch Telegram updates.");
+  }
+};
+
+// Function to update user's Telegram details in Appwrite
+export const updateUserTelegramDetails = async (userId: string, updates: any) => {
+  try {
+    const { databases } = await createSessionClient(); // Get an admin client instance
+    return await databases.updateDocument(  
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      userId,
+      updates
+    );
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    throw new Error("Failed to update user Telegram details.");
+  }
+};
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
 

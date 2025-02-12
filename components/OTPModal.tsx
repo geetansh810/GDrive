@@ -44,7 +44,7 @@ const OtpModal = ({
 
       console.log({ sessionId });
 
-      if (sessionId) router.push("/");
+      if (sessionId) router.push("/connect-telegram");
     } catch (error) {
       console.log("Failed to verify OTP", error);
     }

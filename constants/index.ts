@@ -5,14 +5,19 @@ export const navItems = [
     url: "/",
   },
   {
-    name: "Documents",
+    name: "My Drive",
     icon: "/assets/icons/documents.svg",
-    url: "/documents",
+    url: "/my-drive",
   },
   {
     name: "Images",
     icon: "/assets/icons/images.svg",
     url: "/images",
+  },
+  {
+    name: "Documents",
+    icon: "/assets/icons/documents.svg",
+    url: "/documents",
   },
   {
     name: "Media",

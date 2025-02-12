@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { client, databases } from "@/lib/appwrite"; // Appwrite client
+import { createSessionClient } from "@/lib/appwrite"; // Appwrite client
 import axios from "axios";
 
 export async function GET(req: Request) {
     try {
+        const { databases } = await createSessionClient();
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get("userId");
 

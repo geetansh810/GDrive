@@ -18,7 +18,7 @@ import {
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { verifySecret, sendEmailOTP } from "@/lib/actions/user.actions";
+import { verifySecret, sendEmailOTP, checkTelegramVerification } from "@/lib/actions/user.actions";
 import { useRouter } from "next/navigation";
 
 const OtpModal = ({
@@ -44,7 +44,13 @@ const OtpModal = ({
 
       console.log({ sessionId });
 
-      if (sessionId) router.push("/connect-telegram");
+      if (sessionId){
+        if(await checkTelegramVerification()){
+          router.push("/dashboard");
+        }else{
+          router.push("/connect-telegram");
+        }
+      }  
     } catch (error) {
       console.log("Failed to verify OTP", error);
     }

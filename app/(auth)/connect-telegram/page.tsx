@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { updateUserTelegramDetails, fetchTelegramUpdates, getCurrentUser, signOutUser } from "@/lib/actions/user.actions";
+import { updateUserTelegramDetails, fetchTelegramUpdates, getCurrentUser, signOutUser, checkTelegramVerification } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,8 @@ const ConnectTelegram = () => {
         setMessage("");
 
         try {
+            console.log(await checkTelegramVerification());
+
             const updates = await fetchTelegramUpdates();
             console.log("Telegram Updates:", updates);
 
@@ -91,6 +93,8 @@ const ConnectTelegram = () => {
     const handleStartChat = () => {
         window.open(`https://t.me/GeetDriveBot?start`, "_blank");
     };
+
+    
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">

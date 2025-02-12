@@ -96,6 +96,7 @@ export const createAccount = async ({
   return parseStringify({ accountId });
 };
 
+
 export const verifySecret = async ({
   accountId,
   password,
@@ -139,6 +140,18 @@ export const getCurrentUser = async () => {
   } catch (error) {
     console.log(error);
   }
+};
+export const checkTelegramVerification = async () => {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) throw new Error("User not found");
+
+    return user.telegramVerified
+  } catch (error) {
+    handleError(error, "Failed to check Telegram verification");
+    return false;
+  } 
 };
 
 export const signOutUser = async () => {

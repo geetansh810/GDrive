@@ -19,7 +19,7 @@ const Sidebar = ({ fullName, avatar, email }: Props) => {
     <aside className="sidebar">
       <Link href="/">
         <Image
-          src="/assets/icons/ByteBoxFullLogo.png"
+          src="/assets/brand-logos/vector/default-monochrome.svg"
           alt="logo"
           width={160}
           height={50}
@@ -27,7 +27,7 @@ const Sidebar = ({ fullName, avatar, email }: Props) => {
         />
 
         <Image
-          src="/assets/icons/byteBoxNoBg.png"
+          src="/assets/brand-logos/vector/default-monochrome.svg"
           alt="logo"
           width={52}
           height={52}

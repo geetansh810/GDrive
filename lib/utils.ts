@@ -230,6 +230,6 @@ export const getFileTypesParams = (type: string) => {
     case "others":
       return ["other"];
     default:
-      return ["document"];
+      return ["document", "image", "video", "audio", "other"];
   }
 };

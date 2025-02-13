@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { createAdminClient, createSessionClient } from "@/lib/appwrite";
+import { createAdminClient } from "@/lib/appwrite";
 import { Query } from "appwrite";
 
 export async function POST(req: Request) {
     try {
         console.log("Heloooooooo");
         const { email } = await req.json();
-        const { storage, databases } = await createAdminClient();
+        const { databases } = await createAdminClient();
 
         // Find user in Appwrite database
         const userResponse = await databases.listDocuments(

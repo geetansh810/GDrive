@@ -15,18 +15,17 @@ import { getCurrentUser } from "@/lib/actions/user.actions";
 import axios from 'axios';
 import FormData from 'form-data';
 import { generateThumbnail } from "./cloudinary.actions";
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID!;
+const NEXT_PUBLIC_TELEGRAM_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN!;
 
 const handleError = (error: unknown, message: string) => {
   console.log(error, message);
   throw error;
 };
 
-const uploadToTelegram = async (fileBuffer: Buffer, fileName: string, mimeType: string) => {
+const uploadToTelegram = async (fileBuffer: Buffer, fileName: string, mimeType: string, telegramChatId: string | undefined) => {
   try {
     const formData = new FormData();
-    formData.append("chat_id", TELEGRAM_CHAT_ID);
+    formData.append("chat_id", telegramChatId);
 
     // Choose the correct Telegram API field based on file type
     let telegramField: string;
@@ -43,7 +42,7 @@ const uploadToTelegram = async (fileBuffer: Buffer, fileName: string, mimeType: 
 
     // Upload to Telegram
     const response = await axios.post(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/send${telegramField.charAt(0).toUpperCase() + telegramField.slice(1)}`,
+      `https://api.telegram.org/bot${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/send${telegramField.charAt(0).toUpperCase() + telegramField.slice(1)}`,
       formData,
       { headers: formData.getHeaders() }
     );
@@ -63,13 +62,13 @@ const uploadToTelegram = async (fileBuffer: Buffer, fileName: string, mimeType: 
 
 const getTelegramFileURL = async (telegramFileId: string) => {
   const response = await axios.get(
-    `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getFile?file_id=${telegramFileId}`
+    `https://api.telegram.org/bot${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/getFile?file_id=${telegramFileId}`
   );
   // console.log("URL Response -> ",response.data);
   // console.log("-------------");
 
   const filePath = response.data.result.file_path;
-  return `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`;
+  return `https://api.telegram.org/file/bot${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/${filePath}`;
 };
 
 export const uploadFile = async ({
@@ -77,6 +76,7 @@ export const uploadFile = async ({
   ownerId,
   accountId,
   path,
+  telegramChatId
 }: UploadFileProps) => {
   const { storage, databases } = await createAdminClient();
   try {
@@ -96,7 +96,7 @@ export const uploadFile = async ({
     // Start both uploads in parallel
     const [bucketFile, telegramFileId, thumbnailUrl] = await Promise.all([
       storage.createFile(appwriteConfig.bucketId, ID.unique(), inputFile),
-      uploadToTelegram(buffer, file.name, file.type), // Pass Buffer instead of File
+      uploadToTelegram(buffer, file.name, file.type, telegramChatId), // Pass Buffer instead of File
       generateThumbnail(buffer, file.type, file.name)
     ]);
 
@@ -116,7 +116,10 @@ export const uploadFile = async ({
       bucketFileId: bucketFile.$id,
       telegramFileId,
       telegramFileURL: await getTelegramFileURL(telegramFileId),
-      // thumbnail: thumbnailUrl, // Store the thumbnail URL
+      thumbnail: thumbnailUrl, // Store the thumbnail URL
+      telegramChatId,
+      modifiedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
 
 
@@ -195,12 +198,11 @@ export const getFiles = async ({
 
     console.log({ files });
 
-    // files.documents.map( async (file) => {
-    //   const telegramFileId = file.telegramFileId;
-    //   const url = await getTelegramFileURL(telegramFileId);
-    //   console.log(file.name,"-->",url);
-    //   return url;
-    // })
+    files.documents.forEach(async (file) => {
+      const telegramFileId = file.telegramFileId;
+      const generatedTelegramFileUrl = await getTelegramFileURL(telegramFileId);
+      file.telegramFileUrl = generatedTelegramFileUrl;
+    });
 
     return parseStringify(files);
   } catch (error) {

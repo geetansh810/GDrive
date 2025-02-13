@@ -20,6 +20,9 @@ const ConnectTelegram = () => {
             setIsLoading(true);
             try {
                 const userData = await getCurrentUser();
+                if(userData.telegramVerified) {
+                    window.location.href = "/"; // Redirect to sign-in page
+                }
                 setUser(userData);
                 setTelegramUsername(userData.telegramUsername);
             } catch (error) {
@@ -42,7 +45,7 @@ const ConnectTelegram = () => {
             console.log("Telegram Updates:", updates);
 
             const startMessage = updates.find(
-                (update) =>
+                (update : any) =>
                     update.message &&
                     update.message.text === "/start" &&
                     update.message.chat.username === telegramUsername
@@ -75,11 +78,11 @@ const ConnectTelegram = () => {
     const handleUpdateUsername = async () => {
         setIsLoading(true);
         try {
-            await updateUserTelegramDetails(user.id, { telegramUsername });
+            await updateUserTelegramDetails(user.$id, { telegramUsername });
             setMessage("Telegram username updated successfully.");
             setIsModalOpen(false);
         } catch (error) {
-            console.error("Error updating Telegram username:", error);
+            console.log("Error updating Telegram username:", error);
             setMessage("Failed to update username.");
         }
         setIsLoading(false);

@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 
         // Fetch Telegram updates
         const response = await axios.get(
-            `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/getUpdates`
+            `https://api.telegram.org/bot${process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/getUpdates`
         );
 
         const updates = response.data.result;

@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   const currentUser = await getCurrentUser();
-
+  console.log(currentUser);
+  if (!currentUser.telegramVerified) return redirect("/connect-telegram");
   if (!currentUser) return redirect("/sign-in");
 
   return (
@@ -19,7 +20,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 
       <section className="flex h-full flex-1 flex-col">
         <MobileNavigation {...currentUser} />
-        <Header userId={currentUser.$id} accountId={currentUser.accountId} />
+        <Header userId={currentUser.$id} accountId={currentUser.accountId} telegramChatId={currentUser.telegramChatId}/>
         <div className="main-content">{children}</div>
       </section>
 

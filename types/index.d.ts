@@ -18,6 +18,7 @@ declare interface UploadFileProps {
   ownerId: string;
   accountId: string;
   path: string;
+  telegramChatId?: string;
 }
 declare interface GetFilesProps {
   types: FileType[];

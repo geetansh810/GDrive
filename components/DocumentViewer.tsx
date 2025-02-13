@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 import {
     FaArrowLeft,
@@ -11,16 +12,27 @@ interface DocumentViewerProps {
     url: string;
     name: string;
     onClose: () => void;
+    type: string;
 }
 
-const DocumentViewer: React.FC<DocumentViewerProps> = ({ url, name, onClose }) => {
-    const fileExtension = url.split(".").pop()?.toLowerCase();
+const DocumentViewer: React.FC<DocumentViewerProps> = ({ url, name, onClose, type }) => {
+    const fileExtension = type;
 
     const renderPreview = () => {
         if (!url) return <p className="text-center">No file selected</p>;
 
-        if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExtension || "")) {
-            return <img src={url} alt={name} className="max-h-[80vh] mx-auto" />;
+        // if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExtension || "")) {
+        //     return <img src={url} alt={name} className="max-h-[80vh] mx-auto" />;
+        // }
+
+        if (type === "image") {
+            return <Image
+                src={url} 
+                alt={name} 
+                className="mx-auto max-h-[80vh]"
+                width={500}
+                height={500}
+            />
         }
 
         if (fileExtension === "pdf") {

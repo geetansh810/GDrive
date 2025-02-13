@@ -8,15 +8,17 @@ import { signOutUser } from "@/lib/actions/user.actions";
 const Header = ({
   userId,
   accountId,
+  telegramChatId
 }: {
   userId: string;
   accountId: string;
+  telegramChatId: string;
 }) => {
   return (
     <header className="header">
       <Search />
       <div className="header-wrapper">
-        <FileUploader ownerId={userId} accountId={accountId} />
+        <FileUploader ownerId={userId} accountId={accountId} telegramChatId={telegramChatId}/>
         <form
           action={async () => {
             "use server";

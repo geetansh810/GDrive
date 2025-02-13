@@ -8,11 +8,13 @@ import { cookies } from "next/headers";
 import { avatarPlaceholderUrl } from "@/constants";
 import { redirect } from "next/navigation";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
 
 export const fetchTelegramUpdates = async () => {
   try {
     const response = await axios.get(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/getUpdates`
+      `https://api.telegram.org/bot${process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/getUpdates`
     );
     return response.data.result || [];
   } catch (error) {
@@ -68,9 +70,15 @@ export const sendEmailOTP = async ({ email }: { email: string }) => {
 export const createAccount = async ({
   fullName,
   email,
+  mobile,
+  password,
+  telegramUsername,
 }: {
   fullName: string;
   email: string;
+  mobile: string;
+  password: string;
+  telegramUsername: string;
 }) => {
   const existingUser = await getUserByEmail(email);
 
@@ -79,23 +87,39 @@ export const createAccount = async ({
 
   if (!existingUser) {
     const { databases } = await createAdminClient();
+    const userId = uuidv4(); // Generate a unique userId
+    const hashedPassword = bcrypt.hashSync(password); // Encrypt password using userId as salt
 
     await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollectionId,
       ID.unique(),
       {
+        userId,
         fullName,
         email,
+        mobile,
+        password: hashedPassword,
+        telegramUsername,
         avatar: avatarPlaceholderUrl,
         accountId,
-      },
+        telegramChatId: null,
+        telegramVerified: false,
+        telegramUserId: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        friends: null,
+        friendRequests: null,
+        sharedFolders: null,
+        fileTransactions: null,
+        usageHistory: null,
+        metadata: null,
+      }
     );
   }
 
-  return parseStringify({ accountId });
+  return { accountId };
 };
-
 
 export const verifySecret = async ({
   accountId,

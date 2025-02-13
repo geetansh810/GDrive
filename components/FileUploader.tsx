@@ -16,9 +16,10 @@ interface Props {
   ownerId: string;
   accountId: string;
   className?: string;
+  telegramChatId?: string;
 }
 
-const FileUploader = ({ ownerId, accountId, className }: Props) => {
+const FileUploader = ({ ownerId, accountId, className, telegramChatId }: Props) => {
   const path = usePathname();
   const { toast } = useToast();
   const [files, setFiles] = useState<File[]>([]);
@@ -44,7 +45,7 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
           });
         }
 
-        return uploadFile({ file, ownerId, accountId, path }).then(
+        return uploadFile({ file, ownerId, accountId, path, telegramChatId }).then(
           (uploadedFile) => {
             if (uploadedFile) {
               setFiles((prevFiles) =>

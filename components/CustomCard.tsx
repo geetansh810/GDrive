@@ -1,39 +1,54 @@
 import { Models } from "node-appwrite";
-import Link from "next/link";
-import Thumbnail from "@/components/Thumbnail";
-import { convertFileSize } from "@/lib/utils";
+import { convertFileSize, getFileIcon } from "@/lib/utils";
 import FormattedDateTime from "@/components/FormattedDateTime";
 import ActionDropdown from "@/components/ActionDropdown";
+import CustomThumbnail from "./CustomThumbnail";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const CustomCard = ({ file }: { file: Models.Document }) => {
     return (
-        <div className="file-card">
-            <div className="flex justify-between">
-                <Thumbnail
+        <div className="w-56 rounded-lg bg-white p-3 shadow-md transition-all hover:shadow-lg">
+            {/* 🔹 Top Section: File Type Icon, Name & More Button */}
+            <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <Image
+                        src={getFileIcon(file.extension, file.type)}
+                        alt="thumbnail"
+                        width={60}
+                        height={60}
+                        className="size-5 object-cover"
+                    />
+                    <p className="w-32 truncate text-sm font-medium">{file.name}</p>
+                </div>
+                <ActionDropdown file={file} />
+            </div>
+
+            {/* 🔹 Middle Section: Thumbnail */}
+            <div className="flex h-28 items-center justify-center overflow-hidden rounded-md bg-gray-100">
+                <CustomThumbnail
                     type={file.type}
                     extension={file.extension}
                     url={file.thumbnail}
-                    className="!size-20"
-                    imageClassName="!size-11"
+                    className="size-full object-cover"
                 />
-
-                <div className="flex flex-col items-end justify-between">
-                    <ActionDropdown file={file} />
-                    <p className="body-1">{convertFileSize(file.size)}</p>
-                </div>
             </div>
 
-            <div className="file-card-details">
-                <p className="subtitle-2 line-clamp-1">{file.name}</p>
-                <FormattedDateTime
-                    date={file.$createdAt}
-                    className="body-2 text-light-100"
-                />
-                <p className="caption line-clamp-1 text-light-200">
-                    By: {file.owner.fullName}
-                </p>
+            {/* 🔹 Bottom Section: File Size, Date & Owner (One Line) */}
+            <div className="mt-2 flex items-center justify-between text-xs text-gray-600">
+                <div className="flex items-center gap-2">
+                    <Avatar className="size-5 object-cover">
+                        <AvatarImage src={file.owner?.avatar || "/default-avatar.png"} alt="User Avatar" />
+                        <AvatarFallback>{file.owner?.fullName?.charAt(0) || "U"}</AvatarFallback>
+                    </Avatar>
+
+                    <FormattedDateTime date={file.$createdAt} />
+                </div>
+                {/* <p className="truncate">By: {file.owner.fullName}</p> */}
+                <p>{convertFileSize(file.size)}</p>
             </div>
         </div>
     );
 };
+
 export default CustomCard;

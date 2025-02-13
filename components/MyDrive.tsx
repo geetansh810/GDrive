@@ -1,7 +1,6 @@
 'use client'
 import React, { useState } from "react";
 import DocumentViewer from "@/components/DocumentViewer";
-import { FaFilePdf, FaFileImage, FaFileAlt, FaFile } from "react-icons/fa";
 import Sort from "./Sort";
 import { Models } from "node-appwrite";
 import CustomCard from "./CustomCard";
@@ -15,23 +14,8 @@ import CustomCard from "./CustomCard";
 const MyDrive = ({ files } : {files : any}) => {
     const [selectedFile, setSelectedFile] = useState<any>(null);
 
-    console.log("---------");
-    console.log(files);
-
-    const getFileIcon = (url: string) => {
-        const fileExtension = url.split(".").pop()?.toLowerCase();
-
-        if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExtension || "")) {
-            return <FaFileImage size={50} className="text-blue-500" />;
-        }
-        if (fileExtension === "pdf") {
-            return <FaFilePdf size={50} className="text-red-500" />;
-        }
-        if (["doc", "docx", "txt"].includes(fileExtension || "")) {
-            return <FaFileAlt size={50} className="text-green-500" />;
-        }
-        return <FaFile size={50} className="text-gray-500" />;
-    };
+    // console.log("---------");
+    // console.log(files);
 
     return (
 

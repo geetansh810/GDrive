@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     FaArrowLeft,
     FaDownload,
@@ -16,42 +16,65 @@ interface DocumentViewerProps {
 }
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ url, name, onClose, type }) => {
-    const fileExtension = type;
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (!url) return;
+
+        const fileLoader = document.createElement("img"); // Correct way to create an image element
+        fileLoader.src = url;
+        fileLoader.onload = () => setIsLoading(false);
+        fileLoader.onerror = () => setIsLoading(false);
+    }, [url]);
+
+    const handleDownload = () => {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = name; // Set the original file name for download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     const renderPreview = () => {
         if (!url) return <p className="text-center">No file selected</p>;
 
-        // if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExtension || "")) {
-        //     return <img src={url} alt={name} className="max-h-[80vh] mx-auto" />;
-        // }
-
         if (type === "image") {
-            return <Image
-                src={url} 
-                alt={name} 
-                className="mx-auto max-h-[80vh]"
-                width={500}
-                height={500}
-            />
+            return (
+                <div className="w-full h-full flex items-center justify-center">
+                    {isLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
+                            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    )}
+                    <Image
+                        src={url}
+                        alt={name}
+                        className="w-full h-full object-contain"
+                        width={500}
+                        height={500}
+                        onLoad={() => setIsLoading(false)}
+                    />
+                </div>
+            );
         }
 
-        if (fileExtension === "pdf") {
+        if (type === "document") {
             return (
                 <iframe
                     src={`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`}
-                    width="100%"
-                    height="600px"
+                    className="w-full h-full"
+                    onLoad={() => setIsLoading(false)}
                 />
             );
         }
 
         return (
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center w-full h-full">
                 <p className="text-gray-500">Cannot preview this file type.</p>
                 <a
                     href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    download={name}
                     className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
                     Download File
@@ -62,7 +85,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ url, name, onClose, typ
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-            <div className="bg-white w-[90%] max-w-4xl rounded-lg shadow-lg overflow-hidden">
+            <div className="bg-white w-[90%] max-w-6xl h-[90vh] rounded-lg shadow-lg flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between bg-gray-100 px-4 py-3 border-b">
                     <button onClick={onClose} className="text-gray-600 hover:text-black">
@@ -73,9 +96,9 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ url, name, onClose, typ
                         <button className="text-gray-600 hover:text-black">
                             <FaPrint size={18} />
                         </button>
-                        <a href={url} download className="text-gray-600 hover:text-black">
+                        <button onClick={handleDownload} className="text-gray-600 hover:text-black">
                             <FaDownload size={18} />
-                        </a>
+                        </button>
                         <button className="text-gray-600 hover:text-black">
                             <FaEllipsisV size={18} />
                         </button>
@@ -86,7 +109,14 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ url, name, onClose, typ
                 </div>
 
                 {/* Content (File Preview) */}
-                <div className="p-4 flex items-center justify-center">{renderPreview()}</div>
+                <div className="flex-1 flex items-center justify-center relative bg-gray-100">
+                    {isLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
+                            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    )}
+                    {renderPreview()}
+                </div>
             </div>
         </div>
     );

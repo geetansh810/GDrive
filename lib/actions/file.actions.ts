@@ -22,52 +22,82 @@ const handleError = (error: unknown, message: string) => {
   throw error;
 };
 
-const uploadToTelegram = async (fileBuffer: Buffer, fileName: string, mimeType: string, telegramChatId: string | undefined) => {
+// const uploadToTelegram = async (fileBuffer: Buffer, fileName: string, mimeType: string, telegramChatId: string | undefined) => {
+//   try {
+//     const formData = new FormData();
+//     formData.append("chat_id", telegramChatId);
+
+//     // Choose the correct Telegram API field based on file type
+//     let telegramField: string;
+//     if (mimeType.startsWith("image/")) {
+//       telegramField = "photo"; // Image upload
+//     } else if (mimeType.startsWith("video/")) {
+//       telegramField = "video"; // Video upload
+//     } else {
+//       telegramField = "document"; // PDFs & other files
+//     }
+
+//     // Append the file
+//     formData.append(telegramField, fileBuffer, { filename: fileName });
+
+//     // Upload to Telegram
+//     const response = await axios.post(
+//       `https://api.telegram.org/bot${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/send${telegramField.charAt(0).toUpperCase() + telegramField.slice(1)}`,
+//       formData,
+//       { headers: formData.getHeaders() }
+//     );
+
+//     console.log("Telegram Upload Success:", JSON.stringify(response.data));
+//     console.log("telegramField", telegramField);
+
+//     // Extract Telegram file ID
+//     const fieldData = response.data.result[telegramField];
+//     const telegramFileId = Array.isArray(fieldData) ? fieldData[0].file_id : fieldData.file_id;
+//     return telegramFileId;
+//   } catch (error) {
+//     console.error("Telegram Upload Failed:", error);
+//     throw new Error("Failed to upload to Telegram");
+//   }
+// };
+
+const uploadToTelegram = async (
+  fileBuffer: Buffer,
+  fileName: string,
+  mimeType: string,
+  telegramChatId: string | undefined
+) => {
   try {
     const formData = new FormData();
     formData.append("chat_id", telegramChatId);
+    formData.append("document", fileBuffer, { filename: fileName }); // Upload everything as a document
 
-    // Choose the correct Telegram API field based on file type
-    let telegramField: string;
-    if (mimeType.startsWith("image/")) {
-      telegramField = "photo"; // Image upload
-    } else if (mimeType.startsWith("video/")) {
-      telegramField = "video"; // Video upload
-    } else {
-      telegramField = "document"; // PDFs & other files
-    }
-
-    // Append the file
-    formData.append(telegramField, fileBuffer, { filename: fileName });
-
-    // Upload to Telegram
+    // Send the file using Telegram's sendDocument API
     const response = await axios.post(
-      `https://api.telegram.org/bot${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/send${telegramField.charAt(0).toUpperCase() + telegramField.slice(1)}`,
+      `https://api.telegram.org/bot${process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/sendDocument`,
       formData,
       { headers: formData.getHeaders() }
     );
 
     console.log("Telegram Upload Success:", JSON.stringify(response.data));
-    console.log("telegramField", telegramField);
 
     // Extract Telegram file ID
-    const fieldData = response.data.result[telegramField];
-    const telegramFileId = Array.isArray(fieldData) ? fieldData[0].file_id : fieldData.file_id;
+    const telegramFileId = response.data.result.document.file_id;
     return telegramFileId;
   } catch (error) {
     console.error("Telegram Upload Failed:", error);
     throw new Error("Failed to upload to Telegram");
   }
 };
-
 const getTelegramFileURL = async (telegramFileId: string) => {
   const response = await axios.get(
     `https://api.telegram.org/bot${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/getFile?file_id=${telegramFileId}`
   );
-  // console.log("URL Response -> ",response.data);
-  // console.log("-------------");
+  console.log("URL Response -> ",response.data);
+  console.log("-------------");
 
   const filePath = response.data.result.file_path;
+  console.log(`https://api.telegram.org/file/bot${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/${filePath}`);
+  
   return `https://api.telegram.org/file/bot${NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/${filePath}`;
 };
 

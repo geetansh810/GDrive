@@ -24,6 +24,7 @@ export const fetchTelegramUpdates = async () => {
 };
 
 // Function to update user's Telegram details in Appwrite
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const updateUserTelegramDetails = async (userId: string, updates: any) => {
   try {
     const { databases } = await createSessionClient(); // Get an admin client instance
@@ -148,6 +149,9 @@ export const verifySecret = async ({
 
 export const getCurrentUser = async () => {
   try {
+    const session = (await cookies()).get("appwrite-session");
+    if (!session || !session.value) return null;
+
     const { databases, account } = await createSessionClient();
 
     const result = await account.get();

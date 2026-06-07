@@ -7,12 +7,13 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, LogOut, RefreshCcw, Pencil, Send } from "lucide-react";
+import { Models } from "node-appwrite";
 
 const ConnectTelegram = () => {
     const [telegramUsername, setTelegramUsername] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<Models.Document | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
@@ -21,7 +22,7 @@ const ConnectTelegram = () => {
             try {
                 const userData = await getCurrentUser();
                 if(userData.telegramVerified) {
-                    window.location.href = "/"; // Redirect to sign-in page
+                    window.location.href = "/dashboard"; // Redirect to dashboard
                 }
                 setUser(userData);
                 setTelegramUsername(userData.telegramUsername);
@@ -35,6 +36,10 @@ const ConnectTelegram = () => {
     }, []);
 
     const handleRefresh = async () => {
+        if (!user) {
+            setMessage("User data not loaded yet.");
+            return;
+        }
         setIsLoading(true);
         setMessage("");
 
@@ -45,7 +50,7 @@ const ConnectTelegram = () => {
             console.log("Telegram Updates:", updates);
 
             const startMessage = updates.find(
-                (update : any) =>
+                (update : { message?: { text: string; chat: { username: string; id: number }; from: { id: number } } }) =>
                     update.message &&
                     update.message.text === "/start" &&
                     update.message.chat.username === telegramUsername
@@ -62,7 +67,7 @@ const ConnectTelegram = () => {
                 setMessage("Successfully connected to Telegram bot!");
                 console.log("Updated User:", updatedUser);
                 if (updatedUser.telegramVerified) {
-                    window.location.href = "/"; // Redirect to sign-in page
+                    window.location.href = "/dashboard"; // Redirect to dashboard
                 }
             } else {
                 setMessage("No matching /start message found. Try again after starting chat.");
@@ -76,6 +81,10 @@ const ConnectTelegram = () => {
     };
 
     const handleUpdateUsername = async () => {
+        if (!user) {
+            setMessage("User data not loaded yet.");
+            return;
+        }
         setIsLoading(true);
         try {
             await updateUserTelegramDetails(user.$id, { telegramUsername });

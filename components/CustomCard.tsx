@@ -8,24 +8,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const CustomCard = ({ file }: { file: Models.Document }) => {
     return (
-        <div className="w-56 rounded-lg bg-white p-3 shadow-md transition-all hover:shadow-lg">
+        <div className="w-56 rounded-lg bg-white dark:bg-dark-200 text-dark-200 dark:text-light-100 p-3 shadow-md transition-all hover:shadow-lg">
             {/* 🔹 Top Section: File Type Icon, Name & More Button */}
             <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <Image
-                        src={getFileIcon(file.extension, file.type)}
-                        alt="thumbnail"
-                        width={60}
-                        height={60}
-                        className="size-5 object-cover"
+                         src={getFileIcon(file.extension, file.type)}
+                         alt="thumbnail"
+                         width={60}
+                         height={60}
+                         className="size-5 object-cover"
                     />
-                    <p className="w-32 truncate text-sm font-medium">{file.name}</p>
+                    <p className="w-32 truncate text-sm font-medium text-dark-200 dark:text-light-100">{file.name}</p>
                 </div>
                 <ActionDropdown file={file} />
             </div>
 
             {/* 🔹 Middle Section: Thumbnail */}
-            <div className="flex h-28 items-center justify-center overflow-hidden rounded-md bg-gray-100">
+            <div className="flex h-28 items-center justify-center overflow-hidden rounded-md bg-gray-100 dark:bg-dark-100">
                 <CustomThumbnail
                     type={file.type}
                     extension={file.extension}
@@ -35,7 +35,7 @@ const CustomCard = ({ file }: { file: Models.Document }) => {
             </div>
 
             {/* 🔹 Bottom Section: File Size, Date & Owner (One Line) */}
-            <div className="mt-2 flex items-center justify-between text-xs text-gray-600">
+            <div className="mt-2 flex items-center justify-between text-xs text-gray-600 dark:text-light-200">
                 <div className="flex items-center gap-2">
                     <Avatar className="size-5 object-cover">
                         <AvatarImage src={file.owner?.avatar || "/default-avatar.png"} alt="User Avatar" />

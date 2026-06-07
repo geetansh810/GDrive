@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSessionClient } from "@/lib/appwrite"; // Appwrite client
+import { appwriteConfig } from "@/lib/appwrite/config";
 import axios from "axios";
 
 export async function GET(req: Request) {
@@ -20,15 +21,18 @@ export async function GET(req: Request) {
         const updates = response.data.result;
 
         // Check if the user has started the bot
-        const chat = updates.find((update: any) => update.message?.from?.id.toString() === userId);
+        const chat = updates.find(
+            (update: { message?: { from?: { id: number | string }; chat: { id: number | string } } }) => 
+                update.message?.from?.id.toString() === userId
+        );
 
         if (chat) {
             const telegramChatId = chat.message.chat.id.toString();
 
             // Update Appwrite database
             await databases.updateDocument(
-                "database_id", // Replace with your actual Appwrite database ID
-                "users_collection", // Replace with your collection ID
+                appwriteConfig.databaseId,
+                appwriteConfig.usersCollectionId,
                 userId,
                 { telegramChatId }
             );

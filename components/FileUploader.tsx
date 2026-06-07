@@ -58,7 +58,7 @@ const FileUploader = ({ ownerId, accountId, className, telegramChatId }: Props) 
 
       await Promise.all(uploadPromises);
     },
-    [ownerId, accountId, path],
+    [ownerId, accountId, path, telegramChatId, toast],
   );
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });

@@ -228,11 +228,14 @@ export const getFiles = async ({
 
     console.log({ files });
 
-    files.documents.forEach(async (file) => {
-      const telegramFileId = file.telegramFileId;
-      const generatedTelegramFileUrl = await getTelegramFileURL(telegramFileId);
-      file.telegramFileUrl = generatedTelegramFileUrl;
-    });
+    await Promise.all(
+      files.documents.map(async (file) => {
+        const telegramFileId = file.telegramFileId;
+        const generatedTelegramFileUrl = await getTelegramFileURL(telegramFileId);
+        file.telegramFileURL = generatedTelegramFileUrl;
+        file.telegramFileUrl = generatedTelegramFileUrl;
+      })
+    );
 
     return parseStringify(files);
   } catch (error) {

@@ -11,8 +11,8 @@ import CustomCard from "./CustomCard";
 //     // { name: "Unknown File", url: "https://your-telegram-file-url.com/sample.xyz" }
 // ];
 
-const MyDrive = ({ files } : {files : any}) => {
-    const [selectedFile, setSelectedFile] = useState<any>(null);
+const MyDrive = ({ files } : {files : { documents: Models.Document[]; total: number }}) => {
+    const [selectedFile, setSelectedFile] = useState<Models.Document | null>(null);
 
     // console.log("---------");
     // console.log(files);

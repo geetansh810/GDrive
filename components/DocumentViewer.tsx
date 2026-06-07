@@ -84,35 +84,35 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ url, name, onClose, typ
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-            <div className="bg-white w-[90%] max-w-6xl h-[90vh] rounded-lg shadow-lg flex flex-col overflow-hidden">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
+            <div className="bg-white dark:bg-dark-200 w-[90%] max-w-6xl h-[90vh] rounded-lg shadow-lg flex flex-col overflow-hidden text-dark-200 dark:text-light-100">
                 {/* Header */}
-                <div className="flex items-center justify-between bg-gray-100 px-4 py-3 border-b">
-                    <button onClick={onClose} className="text-gray-600 hover:text-black">
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-dark-100 px-4 py-3 border-b border-gray-200 dark:border-white/5">
+                    <button onClick={onClose} className="text-gray-600 dark:text-light-200 hover:text-black dark:hover:text-white transition-colors">
                         <FaArrowLeft size={20} />
                     </button>
-                    <span className="font-medium text-gray-800">{name}</span>
+                    <span className="font-medium text-gray-800 dark:text-light-100">{name}</span>
                     <div className="flex gap-4">
-                        <button className="text-gray-600 hover:text-black">
+                        <button className="text-gray-600 dark:text-light-200 hover:text-black dark:hover:text-white transition-colors">
                             <FaPrint size={18} />
                         </button>
-                        <button onClick={handleDownload} className="text-gray-600 hover:text-black">
+                        <button onClick={handleDownload} className="text-gray-600 dark:text-light-200 hover:text-black dark:hover:text-white transition-colors">
                             <FaDownload size={18} />
                         </button>
-                        <button className="text-gray-600 hover:text-black">
+                        <button className="text-gray-600 dark:text-light-200 hover:text-black dark:hover:text-white transition-colors">
                             <FaEllipsisV size={18} />
                         </button>
-                        <button className="text-gray-600 hover:text-black">
+                        <button className="text-gray-600 dark:text-light-200 hover:text-black dark:hover:text-white transition-colors">
                             <FaShare size={18} />
                         </button>
                     </div>
                 </div>
 
                 {/* Content (File Preview) */}
-                <div className="flex-1 flex items-center justify-center relative bg-gray-100">
+                <div className="flex-1 flex items-center justify-center relative bg-gray-50 dark:bg-dark-100/50">
                     {isLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
-                            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-dark-200/80 backdrop-blur-sm">
+                            <div className="w-10 h-10 border-4 border-brand-100 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     )}
                     {renderPreview()}

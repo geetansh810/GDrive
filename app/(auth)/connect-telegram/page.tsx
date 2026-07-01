@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { updateUserTelegramDetails, fetchTelegramUpdates, getCurrentUser, signOutUser, checkTelegramVerification } from "@/lib/actions/user.actions";
+import { updateUserTelegramDetails, fetchTelegramUpdates, getCurrentUser, signOutUser } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";

@@ -19,7 +19,7 @@ import path from "path";
 
 const NEXT_PUBLIC_TELEGRAM_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN!;
 
-const handleError = (error: unknown, message: string) => {
+const handleError = (error: unknown, _message: string) => {
 //   console.log(error, message);
   throw error;
 };
@@ -47,7 +47,7 @@ const uploadToTelegram = async (
     // Extract Telegram file ID
     const telegramFileId = response.data.result.document.file_id;
     return telegramFileId;
-  } catch (error) {
+  } catch {
 //     console.error("Telegram Upload Failed:", error);
     throw new Error("Failed to upload to Telegram");
   }
@@ -224,6 +224,7 @@ export const getTelegramFiles = async ({
     }
 
     // 1. Fetch files from MongoDB (bot-sent files)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dbFilter: any = {
       owner: new mongoose.Types.ObjectId(currentUser.$id),
       telegramChatId: currentUser.telegramChatId,
@@ -246,7 +247,7 @@ export const getTelegramFiles = async ({
             mapped.telegramFileUrl = generatedTelegramFileUrl;
             mapped.url = generatedTelegramFileUrl;
           }
-        } catch (err) {
+        } catch {
 //           console.error(`Failed to refresh URL for DB file ${mapped.name}:`, err);
         }
         return mapped;
@@ -254,10 +255,11 @@ export const getTelegramFiles = async ({
     );
 
     // 3. Fetch live updates from Telegram (user-sent files)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let updates: any[] = [];
     try {
       updates = await fetchTelegramUpdates();
-    } catch (err) {
+    } catch {
 //       console.error("Failed to fetch Telegram updates:", err);
     }
 
@@ -318,7 +320,7 @@ export const getTelegramFiles = async ({
       let telegramFileURL = "";
       try {
         telegramFileURL = await getTelegramFileURL(telegramFileId);
-      } catch (err) {
+      } catch {
 //         console.error(`Failed to get file URL for telegramFileId ${telegramFileId}`, err);
         continue;
       }

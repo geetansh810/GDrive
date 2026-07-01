@@ -103,7 +103,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           setErrorMessage("Failed to sign in. Please try again.");
         }
       }
-    } catch (error) {
+    } catch {
       setErrorMessage("Failed to create account. Please try again.");
 //       console.log(error);
       

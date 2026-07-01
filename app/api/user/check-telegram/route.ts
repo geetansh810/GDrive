@@ -36,7 +36,7 @@ export async function GET(req: Request) {
         }
 
         return NextResponse.json({ success: false, message: "Telegram bot not started yet" });
-    } catch (error) {
+    } catch {
 //         console.error("Error checking Telegram status:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

@@ -110,7 +110,7 @@ export const generateThumbnail = async (fileBuffer: Buffer, fileType: string, fi
         }
 
         return null;
-    } catch (error) {
+    } catch {
 //         console.error("Error generating thumbnail:", error);
         return null;
     }

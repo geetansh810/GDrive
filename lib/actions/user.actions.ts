@@ -16,7 +16,7 @@ export const fetchTelegramUpdates = async () => {
       `https://api.telegram.org/bot${process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN}/getUpdates`
     );
     return response.data.result || [];
-  } catch (error) {
+  } catch {
 //     console.error("Error fetching Telegram updates:", error);
     throw new Error("Failed to fetch Telegram updates.");
   }
@@ -34,7 +34,7 @@ export const updateUserTelegramDetails = async (userId: string, updates: any) =>
     if (!updatedUser) throw new Error("User not found");
 
     return mapUserToDocument(updatedUser);
-  } catch (error) {
+  } catch {
 //     console.error("Error updating user details:", error);
     throw new Error("Failed to update user Telegram details.");
   }
@@ -46,7 +46,7 @@ const getUserByEmail = async (email: string) => {
   return user ? mapUserToDocument(user) : null;
 };
 
-const handleError = (error: unknown, message: string) => {
+const handleError = (error: unknown, _message: string) => {
 //   console.log(error, message);
   throw error;
 };
@@ -163,7 +163,7 @@ export const getCurrentUser = async () => {
     if (!user) return null;
 
     return parseStringify(mapUserToDocument(user));
-  } catch (error) {
+  } catch {
 //     console.log(error);
     return null;
   }

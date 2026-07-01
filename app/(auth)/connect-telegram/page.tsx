@@ -25,7 +25,7 @@ const ConnectTelegram = () => {
                 }
                 setUser(userData);
                 setTelegramUsername(userData.telegramUsername);
-            } catch (error) {
+            } catch {
 //                 console.error("Error fetching user data:", error);
             }
             setIsLoading(false);
@@ -71,7 +71,7 @@ const ConnectTelegram = () => {
             } else {
                 setMessage("No matching /start message found. Try again after starting chat.");
             }
-        } catch (error) {
+        } catch {
 //             console.log("Error fetching Telegram updates:", error);
             setMessage("Failed to fetch updates. Please try again.");
         }
@@ -89,7 +89,7 @@ const ConnectTelegram = () => {
             await updateUserTelegramDetails(user.$id, { telegramUsername });
             setMessage("Telegram username updated successfully.");
             setIsModalOpen(false);
-        } catch (error) {
+        } catch {
 //             console.log("Error updating Telegram username:", error);
             setMessage("Failed to update username.");
         }

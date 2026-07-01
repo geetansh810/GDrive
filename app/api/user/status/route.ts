@@ -19,7 +19,7 @@ export async function POST(req: Request) {
             isVerified: user.telegramVerified,
             isConnectedToTelegram: Boolean(user.telegramChatId),
         });
-    } catch (error) {
+    } catch {
 //         console.error("Error checking user status:", error);
         return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
     }

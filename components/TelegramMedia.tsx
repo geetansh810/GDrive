@@ -31,7 +31,7 @@ const TelegramMedia = ({ files, telegramUsername }: Props) => {
         title: "Refreshed",
         description: "Successfully fetched latest media from Telegram chat.",
       });
-    } catch (error) {
+    } catch {
 //       console.error("Refresh error:", error);
       toast({
         title: "Error",

@@ -46,7 +46,8 @@ const getUserByEmail = async (email: string) => {
   return user ? mapUserToDocument(user) : null;
 };
 
-const handleError = (error: unknown, _message: string) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const handleError = (error: unknown, message: string) => {
 //   console.log(error, message);
   throw error;
 };

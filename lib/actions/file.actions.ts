@@ -19,7 +19,8 @@ import path from "path";
 
 const NEXT_PUBLIC_TELEGRAM_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN!;
 
-const handleError = (error: unknown, _message: string) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const handleError = (error: unknown, message: string) => {
 //   console.log(error, message);
   throw error;
 };

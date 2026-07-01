@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { createAccount, signInUser } from "@/lib/actions/user.actions";
-import OtpModal from "@/components/OTPModal";
+import { createAccount, signInUser, checkTelegramVerification } from "@/lib/actions/user.actions";
+import { useRouter } from "next/navigation";
 
 type FormType = "sign-in" | "sign-up";
 
@@ -30,10 +30,7 @@ const authFormSchema = (formType: FormType) => {
       formType === "sign-up"
         ? z.string().min(10).max(15, "Invalid mobile number").regex(/^[0-9]+$/)
         : z.string().optional(),
-    password:
-      formType === "sign-up"
-        ? z.string().min(6, "Password must be at least 6 characters long")
-        : z.string().optional(),
+    password: z.string().min(6, "Password must be at least 6 characters long"),
     telegramUsername:
       formType === "sign-up"
         ? z.string().min(3, "Invalid Telegram username").max(32)
@@ -44,7 +41,7 @@ const authFormSchema = (formType: FormType) => {
 const AuthForm = ({ type }: { type: FormType }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [accountId, setAccountId] = useState<string | null>(null);
+  const router = useRouter();
 
   const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -75,7 +72,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           throw new Error("Please fill all fields");
         }
 
-        const user = await createAccount({
+        await createAccount({
           fullName: values.fullName,
           email: values.email,
           mobile: values.mobile,
@@ -83,20 +80,32 @@ const AuthForm = ({ type }: { type: FormType }) => {
           telegramUsername: values.telegramUsername,
         });
 
-        setAccountId(user.accountId);
+        // Account created and session set, redirect
+        const isTelegramVerified = await checkTelegramVerification();
+        if (isTelegramVerified) {
+          router.push("/dashboard");
+        } else {
+          router.push("/connect-telegram");
+        }
       } else {
-        const user = await signInUser({ email: values.email });
-        if (user?.error) {
-          setErrorMessage(user.error);
-        } else if (user?.accountId) {
-          setAccountId(user.accountId);
+        const result = await signInUser({ email: values.email, password: values.password });
+        if (result?.error) {
+          setErrorMessage(result.error);
+        } else if (result?.accountId) {
+          // Session set, redirect
+          const isTelegramVerified = await checkTelegramVerification();
+          if (isTelegramVerified) {
+            router.push("/dashboard");
+          } else {
+            router.push("/connect-telegram");
+          }
         } else {
           setErrorMessage("Failed to sign in. Please try again.");
         }
       }
     } catch (error) {
       setErrorMessage("Failed to create account. Please try again.");
-      console.log(error);
+//       console.log(error);
       
     } finally {
       setIsLoading(false);
@@ -141,20 +150,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
               <FormField
                 control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Enter your password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="telegramUsername"
                 render={({ field }) => (
                   <FormItem>
@@ -183,6 +178,20 @@ const AuthForm = ({ type }: { type: FormType }) => {
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Enter your password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <Button type="submit" disabled={isLoading} className="form-submit-button">
             {type === "sign-in" ? "Sign In" : "Sign Up"}
             {isLoading && <Image src="/assets/icons/loader.svg" alt="loader" width={24} height={24} className="ml-2 animate-spin" />}
@@ -198,7 +207,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
           </div>
         </form>
       </Form>
-      {accountId && <OtpModal email={form.getValues("email")} accountId={accountId} />}
     </>
   );
 };

@@ -28,7 +28,7 @@ const uploadToCloudinary = async (buffer: Buffer, fileName: string, resourceType
             },
             (error, result) => {
                 if (error) {
-                    console.error("Cloudinary upload error:", error);
+//                     console.error("Cloudinary upload error:", error);
                     reject(error);
                 } else {
                     resolve(result?.secure_url ?? null);
@@ -93,7 +93,7 @@ export const generateThumbnail = async (fileBuffer: Buffer, fileType: string, fi
                     { folder: "videos", resource_type: "video", public_id: fileName },
                     (error, result) => {
                         if (error) {
-                            console.error("Cloudinary video upload error:", error);
+//                             console.error("Cloudinary video upload error:", error);
                             reject(error);
                         } else if(result) {
                             // Generate a thumbnail from the video
@@ -111,7 +111,7 @@ export const generateThumbnail = async (fileBuffer: Buffer, fileType: string, fi
 
         return null;
     } catch (error) {
-        console.error("Error generating thumbnail:", error);
+//         console.error("Error generating thumbnail:", error);
         return null;
     }
 };

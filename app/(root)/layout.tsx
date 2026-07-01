@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   const currentUser = await getCurrentUser();
-  console.log(currentUser);
+//   console.log(currentUser);
   if (!currentUser) return redirect("/sign-in");
   if (!currentUser.telegramVerified) return redirect("/connect-telegram");
 

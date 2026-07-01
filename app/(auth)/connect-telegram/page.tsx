@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, LogOut, RefreshCcw, Pencil, Send } from "lucide-react";
-import { Models } from "node-appwrite";
 
 const ConnectTelegram = () => {
     const [telegramUsername, setTelegramUsername] = useState("");
@@ -27,7 +26,7 @@ const ConnectTelegram = () => {
                 setUser(userData);
                 setTelegramUsername(userData.telegramUsername);
             } catch (error) {
-                console.error("Error fetching user data:", error);
+//                 console.error("Error fetching user data:", error);
             }
             setIsLoading(false);
         };
@@ -44,10 +43,10 @@ const ConnectTelegram = () => {
         setMessage("");
 
         try {
-            console.log(await checkTelegramVerification());
+//             console.log(await checkTelegramVerification());
 
             const updates = await fetchTelegramUpdates();
-            console.log("Telegram Updates:", updates);
+//             console.log("Telegram Updates:", updates);
 
             const startMessage = updates.find(
                 (update : { message?: { text: string; chat: { username: string; id: number }; from: { id: number } } }) =>
@@ -55,7 +54,7 @@ const ConnectTelegram = () => {
                     update.message.text === "/start" &&
                     update.message.chat.username === telegramUsername
             );
-            console.log(startMessage, user);
+//             console.log(startMessage, user);
             
             if (startMessage) {
                 const updatedUser = await updateUserTelegramDetails(user.$id, {
@@ -65,7 +64,7 @@ const ConnectTelegram = () => {
                 });
 
                 setMessage("Successfully connected to Telegram bot!");
-                console.log("Updated User:", updatedUser);
+//                 console.log("Updated User:", updatedUser);
                 if (updatedUser.telegramVerified) {
                     window.location.href = "/dashboard"; // Redirect to dashboard
                 }
@@ -73,7 +72,7 @@ const ConnectTelegram = () => {
                 setMessage("No matching /start message found. Try again after starting chat.");
             }
         } catch (error) {
-            console.log("Error fetching Telegram updates:", error);
+//             console.log("Error fetching Telegram updates:", error);
             setMessage("Failed to fetch updates. Please try again.");
         }
 
@@ -91,7 +90,7 @@ const ConnectTelegram = () => {
             setMessage("Telegram username updated successfully.");
             setIsModalOpen(false);
         } catch (error) {
-            console.log("Error updating Telegram username:", error);
+//             console.log("Error updating Telegram username:", error);
             setMessage("Failed to update username.");
         }
         setIsLoading(false);

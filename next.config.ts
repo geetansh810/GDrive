@@ -24,10 +24,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "cloud.appwrite.io",
-      },
-      {
-        protocol: "https",
         hostname: "res.cloudinary.com",
       },
       {

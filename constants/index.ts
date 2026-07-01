@@ -25,6 +25,11 @@ export const navItems = [
     url: "/media",
   },
   {
+    name: "Telegram Media",
+    icon: "/assets/icons/telegram.svg",
+    url: "/telegram-media",
+  },
+  {
     name: "Others",
     icon: "/assets/icons/others.svg",
     url: "/others",

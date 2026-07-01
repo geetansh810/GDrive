@@ -1,4 +1,3 @@
-import { Models } from "node-appwrite";
 import { convertFileSize, getFileIcon } from "@/lib/utils";
 import FormattedDateTime from "@/components/FormattedDateTime";
 import ActionDropdown from "@/components/ActionDropdown";

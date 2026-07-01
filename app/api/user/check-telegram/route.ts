@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { createSessionClient } from "@/lib/appwrite"; // Appwrite client
-import { appwriteConfig } from "@/lib/appwrite/config";
+import connectToDatabase from "@/lib/mongodb";
+import User from "@/lib/models/user.model";
 import axios from "axios";
 
 export async function GET(req: Request) {
     try {
-        const { databases } = await createSessionClient();
+        await connectToDatabase();
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get("userId");
 
@@ -29,20 +29,15 @@ export async function GET(req: Request) {
         if (chat) {
             const telegramChatId = chat.message.chat.id.toString();
 
-            // Update Appwrite database
-            await databases.updateDocument(
-                appwriteConfig.databaseId,
-                appwriteConfig.usersCollectionId,
-                userId,
-                { telegramChatId }
-            );
+            // Update MongoDB
+            await User.findByIdAndUpdate(userId, { telegramChatId });
 
             return NextResponse.json({ success: true, telegramChatId });
         }
 
         return NextResponse.json({ success: false, message: "Telegram bot not started yet" });
     } catch (error) {
-        console.error("Error checking Telegram status:", error);
+//         console.error("Error checking Telegram status:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

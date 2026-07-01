@@ -14,10 +14,12 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#04050C] text-white overflow-x-hidden selection:bg-brand-100 selection:text-white relative">
-      {/* Background Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-[#1FA5FF]/20 to-[#47B6FF]/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#fd366e]/10 to-[#ee0a5e]/5 blur-[150px] pointer-events-none" />
+    <div className="min-h-screen bg-[#04050C] text-white selection:bg-brand-100 selection:text-white relative">
+      {/* Background Glows Container */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-[#1FA5FF]/20 to-[#47B6FF]/5 blur-[120px] will-change-transform" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#fd366e]/10 to-[#ee0a5e]/5 blur-[150px] will-change-transform" />
+      </div>
       
       {/* Header */}
       <header className="container mx-auto px-6 py-6 flex items-center justify-between relative z-10">
@@ -52,7 +54,7 @@ export default async function LandingPage() {
       <section className="container mx-auto px-6 pt-20 pb-28 text-center relative z-10 flex flex-col items-center">
         <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-8 text-xs md:text-sm font-medium text-brand-100 backdrop-blur-md">
           <Bot size={16} />
-          Powered by Telegram & Appwrite Cloud
+          Powered by Telegram & MongoDB
         </div>
         
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-5xl leading-[1.1] bg-gradient-to-b from-white via-white to-white/70 bg-clip-text text-transparent">
@@ -149,9 +151,9 @@ export default async function LandingPage() {
               <div className="w-12 h-12 rounded-xl bg-brand/10 text-brand flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <ShieldCheck size={24} />
               </div>
-              <h3 className="text-xl font-bold mb-3">One-Time Passcode Login</h3>
+              <h3 className="text-xl font-bold mb-3">Secure Password Login</h3>
               <p className="text-white/70 text-sm leading-relaxed">
-                No complex passwords to remember. Log in securely with high-speed Email OTP verification protecting your files against unauthorized access.
+                Log in securely with encrypted password authentication protecting your files against unauthorized access.
               </p>
             </div>
 

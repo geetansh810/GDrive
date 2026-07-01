@@ -1,5 +1,16 @@
 /* eslint-disable no-unused-vars */
 
+// Custom Models namespace to replace node-appwrite Models
+declare namespace Models {
+  interface Document {
+    $id: string;
+    $createdAt: string;
+    $updatedAt: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  }
+}
+
 declare type FileType = "document" | "image" | "video" | "audio" | "other";
 
 declare interface ActionType {

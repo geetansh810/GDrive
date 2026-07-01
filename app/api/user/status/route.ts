@@ -1,33 +1,26 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/appwrite";
-import { Query } from "appwrite";
+import connectToDatabase from "@/lib/mongodb";
+import User from "@/lib/models/user.model";
 
 export async function POST(req: Request) {
     try {
-        console.log("Heloooooooo");
         const { email } = await req.json();
-        const { databases } = await createAdminClient();
+        await connectToDatabase();
 
-        // Find user in Appwrite database
-        const userResponse = await databases.listDocuments(
-            process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-            process.env.NEXT_PUBLIC_APPWRITE_USERS_COLLECTION_ID!,
-            [Query.equal("email", email)]
-        );
+        // Find user in MongoDB
+        const user = await User.findOne({ email }).lean();
 
-        if (userResponse.documents.length === 0) {
+        if (!user) {
             return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
         }
 
-        const user = userResponse.documents[0];
-
         return NextResponse.json({
             success: true,
-            isVerified: user.isVerified, // Assuming this field exists in the collection
-            isConnectedToTelegram: Boolean(user.telegramChatId), // True if chat ID exists
+            isVerified: user.telegramVerified,
+            isConnectedToTelegram: Boolean(user.telegramChatId),
         });
     } catch (error) {
-        console.error("Error checking user status:", error);
+//         console.error("Error checking user status:", error);
         return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
     }
 }
